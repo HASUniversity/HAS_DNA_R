@@ -3,7 +3,7 @@ library(dada2)
 library(phyloseq)
 
 d <- "E:/Seq/S4B/16S/" #path to directory with the FASTQ files
-
+d <- "/mnt/Bravo/16S"
 
 # Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
 fnFs <- sort(
@@ -60,7 +60,8 @@ out <- filterAndTrim(
   fnRs, 
   filtRs, 
   truncLen=c(280,240),
-  trimLeft = c(FWD, REV), # primers still presented in the raw data!
+  # trimLeft = c(FWD, REV), # primers still presented in the raw data!
+  trimLeft = 21, # primers still presented in the raw data!
   maxN=0, 
   maxEE=c(2,2), 
   truncQ=2, 
@@ -69,11 +70,19 @@ out <- filterAndTrim(
   multithread=TRUE
   )
 
-#NB: version with trimming out primers
+#NB: version without trimming out primers
 
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(280,240),
-                     maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
-                     compress=TRUE, multithread=TRUE)
+# out <- filterAndTrim(fnFs, 
+#                      filtFs, 
+#                      fnRs, 
+#                      filtRs, 
+#                      truncLen=c(280,240),
+#                      maxN=0, 
+#                      maxEE=c(2,2), 
+#                      truncQ=2, 
+#                      rm.phix=TRUE,
+#                      compress=TRUE, 
+#                      multithread=TRUE)
 #first number is truncLen for Forward reads; second number is truncLen of Reverse reads)
 head(out)
 
@@ -130,12 +139,19 @@ head(taxa.print)
 theme_set(theme_bw())
 
 samples.out <- rownames(seqtab.nochim)
-subject <- sapply(strsplit(samples.out, "\\."), `[`, 2)
-head(subject)
+# subject <- sapply(strsplit(samples.out, "\\."), `[`, 2)
+# head(subject)
 
 
 #load metadata
-Metadata <- readxl::read_excel("DNA extractie_codering.xlsx")
+Metadata <- readxl::read_excel("/mnt/Charlie/users/Lectoraat_Bodem/S4B/DNA extractie_codering.xlsx") %>% 
+  rename(sample = `Nr epje`)
+# filter  to sample.names
+Metadata <- Metadata %>% filter(sample %in% sample.names)
+# reorder to sample.names
+Metadata <- Metadata[match(sample.names, Metadata$sample),]
+# add row names
+rownames(Metadata) <- Metadata$sample
 
 # create data frame
 S4B_16S <- phyloseq(
@@ -143,19 +159,19 @@ S4B_16S <- phyloseq(
     seqtab.nochim, 
     taxa_are_rows = FALSE
     ),
-  sample_data(
-    Metadata
-    ),
+  # sample_data(
+  #   Metadata
+  #   ),
   tax_table(
     taxa
     )
   )
   
-dna <- Biostrings::DNAStringSet(taxa_names(ps))
-names(dna) <- taxa_names(ps)
-ps <- merge_phyloseq(ps, dna)
-taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
-ps
+dna <- Biostrings::DNAStringSet(taxa_names(S4B_16S))
+names(dna) <- taxa_names(S4B_16S)
+ps <- merge_phyloseq(S4B_16S, dna)
+taxa_names(S4B_16S) <- paste0("ASV", seq(ntaxa(S4B_16S)))
+S4B_16S
 
 # opslaan
 saveRDS(ps, file = "S4B_16S.rds")
