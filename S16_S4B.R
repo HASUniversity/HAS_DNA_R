@@ -3,7 +3,7 @@ library(dada2)
 library(phyloseq)
 
 d <- "E:/Seq/S4B/16S/" #path to directory with the FASTQ files
-d <- "/mnt/Bravo/16S"
+# d <- "/mnt/Bravo/16S"
 
 # Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
 fnFs <- sort(
@@ -19,6 +19,8 @@ fnRs <- sort(
     full.names = TRUE
     )
   )[-153]
+# fnFs <- "E:/Seq/S4B/16S/NX.VH01519_270.001.FLD_ill_050_i7---FLD_ill_0242_i5.S50_R1.fastq.gz"
+# fnRs <- "E:/Seq/S4B/16S/NX.VH01519_270.001.FLD_ill_050_i7---FLD_ill_0242_i5.S50_R2.fastq.gz"
 
 # Extract sample names, assuming filenames have format: **i5SAMPLENAME_R**
 sample.names <- str_match(
@@ -26,8 +28,8 @@ sample.names <- str_match(
   )[, 2]
 
 #Inspect read quality profiles
-plotQualityProfile(fnFs[1:2])
-plotQualityProfile(fnRs[1:2])
+plotQualityProfile(fnFs[1])
+plotQualityProfile(fnRs[1])
 
 # Place filtered files in filtered/ subdirectory
 filtFs <- file.path(

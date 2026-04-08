@@ -60,8 +60,10 @@ rbind(
 
 # Remove primers
 
-cutadapt <- "/bin/cutadapt" # CHANGE ME to the cutadapt path on your machine
+# cutadapt <- "/bin/cutadapt" # CHANGE ME to the cutadapt path on your machine
+cutadapt <- "C:/Users/SmMa/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0/LocalCache/local-packages/Python313/Scripts"
 system2(cutadapt, args = "--version") # Run shell commands from R
+
 
 path.cut <- file.path(d, "cutadapt")
 if(!dir.exists(path.cut)) dir.create(path.cut)
